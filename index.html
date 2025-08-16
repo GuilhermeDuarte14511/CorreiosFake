@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SG Transportes — Cotação de Frete</title>
+  <meta name="description" content="Informe endereços de retirada e entrega. Geolocalização opcional para preencher automaticamente o endereço de retirada. Envie o código de cotação ao anunciante." />
+  <meta name="theme-color" content="#0d6efd" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background: #f6f7fb; }
+    .navbar-brand i { margin-right: .5rem; }
+    .hero { background: linear-gradient(135deg, #0d6efd 0%, #004aad 100%); color: #fff; padding: 64px 0; }
+    .hero h1 { font-weight: 700; }
+    .card-shadow { box-shadow: 0 10px 30px rgba(0,0,0,.08); border: 0; }
+    .form-label .req { color:#dc3545; }
+    .small-muted { color:#6c757d; font-size:.9rem; }
+    .lgpd-box { background:#f1f3f5; border-radius:.5rem; padding:.75rem; font-size:.9rem; }
+    footer { color:#6c757d; }
+    .is-hidden { display:none!important; }
+    .fieldset-title { font-size:.95rem; font-weight:600; color:#0d6efd; margin-bottom:.5rem; }
+    .section-card { border:0; }
+    .copy-badge { cursor:pointer; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-truck-fast"></i> SG Transportes</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Alternar navegação">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#cotacao">Cotação</a></li>
+          <li class="nav-item"><a class="nav-link" href="#como-funciona">Como funciona</a></li>
+          <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <h1 class="mb-3">Cotação de frete rápida e transparente</h1>
+          <p class="mb-4">Preencha os endereços de <strong>Retirada</strong> e <strong>Entrega</strong>. Se quiser, autorize a <strong>localização</strong> para <u>preencher automaticamente</u> a retirada.</p>
+          <span class="badge rounded-pill bg-light text-dark"><i class="fa-solid fa-shield-halved me-1"></i> Dados usados apenas para cotação (LGPD)</span>
+        </div>
+        <div class="col-lg-6">
+          <div class="card card-shadow section-card">
+            <div class="card-body p-4">
+              <h5 class="card-title mb-3" id="cotacao"><i class="fa-solid fa-calculator me-2"></i>Solicitar cotação</h5>
+
+              <form id="formCotacao" novalidate>
+                <!-- Identificação -->
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Nome completo <span class="req">*</span></label>
+                    <input type="text" class="form-control" id="nome" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">E-mail <span class="req">*</span></label>
+                    <input type="email" class="form-control" id="email" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Telefone</label>
+                    <input type="tel" class="form-control" id="telefone" placeholder="(11) 90000-0000">
+                  </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Retirada -->
+                <div class="fieldset-title"><i class="fa-solid fa-box-archive me-1"></i>Endereço de Retirada (origem)</div>
+                <div class="row g-3">
+                  <div class="col-md-5">
+                    <label class="form-label">CEP <span class="req">*</span></label>
+                    <div class="input-group">
+                      <input type="text" class="form-control cep" id="r_cep" placeholder="00000-000" required>
+                      <button class="btn btn-outline-primary" type="button" id="r_btnViaCep" title="Buscar pelo CEP">
+                        <i class="fa-solid fa-magnifying-glass-location"></i>
+                      </button>
+                    </div>
+                    <div class="form-text" id="r_viaCepStatus"></div>
+                  </div>
+                  <div class="col-md-7">
+                    <label class="form-label">Logradouro</label>
+                    <input type="text" class="form-control" id="r_logradouro" placeholder="Rua/Avenida">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Número <span class="req">*</span></label>
+                    <input type="text" class="form-control" id="r_numero" required>
+                  </div>
+                  <div class="col-md-8">
+                    <label class="form-label">Complemento</label>
+                    <input type="text" class="form-control" id="r_complemento" placeholder="Apto, bloco, ponto de ref.">
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label">Bairro</label>
+                    <input type="text" class="form-control" id="r_bairro">
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label">Cidade</label>
+                    <input type="text" class="form-control" id="r_cidade">
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">UF</label>
+                    <select class="form-select uf" id="r_uf">
+                      <option value="">UF</option>
+                      <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+                      <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+                      <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
+                      <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                      <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
+                      <option>SE</option><option>TO</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mt-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="1" id="aceitoLocalizacao">
+                    <label class="form-check-label" for="aceitoLocalizacao">
+                      Usar minha localização atual para a retirada (opcional)
+                    </label>
+                  </div>
+                  <div class="mt-2 small-muted" id="locMsg"><i class="fa-regular fa-compass me-1"></i> Localização não capturada.</div>
+                  <div class="mt-2 is-hidden" id="locLinkWrap">
+                    <a target="_blank" id="locLink" class="small" href="#"><i class="fa-solid fa-map-location-dot me-1"></i>Abrir no mapa</a>
+                  </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Entrega -->
+                <div class="fieldset-title"><i class="fa-solid fa-location-dot me-1"></i>Endereço de Entrega (destino)</div>
+                <div class="row g-3">
+                  <div class="col-md-5">
+                    <label class="form-label">CEP <span class="req">*</span></label>
+                    <div class="input-group">
+                      <input type="text" class="form-control cep" id="e_cep" placeholder="00000-000" required>
+                      <button class="btn btn-outline-primary" type="button" id="e_btnViaCep" title="Buscar pelo CEP">
+                        <i class="fa-solid fa-magnifying-glass-location"></i>
+                      </button>
+                    </div>
+                    <div class="form-text" id="e_viaCepStatus"></div>
+                  </div>
+                  <div class="col-md-7">
+                    <label class="form-label">Logradouro</label>
+                    <input type="text" class="form-control" id="e_logradouro" placeholder="Rua/Avenida">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Número <span class="req">*</span></label>
+                    <input type="text" class="form-control" id="e_numero" required>
+                  </div>
+                  <div class="col-md-8">
+                    <label class="form-label">Complemento</label>
+                    <input type="text" class="form-control" id="e_complemento" placeholder="Apto, bloco, ponto de ref.">
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label">Bairro</label>
+                    <input type="text" class="form-control" id="e_bairro">
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label">Cidade</label>
+                    <input type="text" class="form-control" id="e_cidade">
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">UF</label>
+                    <select class="form-select uf" id="e_uf">
+                      <option value="">UF</option>
+                      <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+                      <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+                      <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
+                      <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                      <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
+                      <option>SE</option><option>TO</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mt-3">
+                  <label class="form-label">Detalhes da carga</label>
+                  <textarea class="form-control" id="detalhes" rows="3" placeholder="Ex.: 4 caixas (25kg), frágil, janela de coleta/entrega"></textarea>
+                </div>
+
+                <div class="lgpd-box mt-3">
+                  <i class="fa-solid fa-circle-info me-1"></i>
+                  Ao enviar, você concorda com o uso dos dados exclusivamente para fins de cotação e contato sobre seu pedido.
+                </div>
+
+                <button class="btn btn-primary w-100 mt-3" type="submit" id="btnEnviar">
+                  <span class="btn-label"><i class="fa-solid fa-paper-plane me-1"></i> Enviar pedido de cotação</span>
+                  <span class="spinner-border spinner-border-sm ms-2 d-none" id="spinner" role="status" aria-hidden="true"></span>
+                </button>
+                <div class="small-muted mt-2" id="submitHint">Os dados serão enviados ao endpoint seguro <code>/api/quote</code>.</div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="py-5">
+    <div class="container">
+      <section class="mb-5" id="como-funciona">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-6">
+            <h3 class="fw-bold mb-3"><i class="fa-solid fa-timeline me-2"></i>Como funciona</h3>
+            <ol class="small-muted">
+              <li>Preencha retirada e entrega (CEP + dados básicos).</li>
+              <li>(Opcional) Autorize a localização para preenchimento automático da retirada.</li>
+              <li>Enviamos sua solicitação ao time de operações.</li>
+              <li>Você recebe a cotação por e-mail junto com o <strong>código de cotação</strong>.</li>
+            </ol>
+          </div>
+          <div class="col-lg-6">
+            <div class="card card-shadow">
+              <div class="card-body">
+                <h6 class="text-uppercase text-muted">Transparência</h6>
+                <p class="mb-0">Seguimos as melhores práticas de privacidade (LGPD). Seus dados não são compartilhados com terceiros para fins de marketing.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq">
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="card card-shadow h-100"><div class="card-body">
+              <h5 class="mb-2"><i class="fa-regular fa-circle-question me-2"></i>Por que pedir geolocalização?</h5>
+              <p class="small-muted mb-0">Para conferir automaticamente o endereço de <b>retirada</b> e agilizar a coleta. É opcional e só com seu consentimento.</p>
+            </div></div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card card-shadow h-100"><div class="card-body">
+              <h5 class="mb-2"><i class="fa-solid fa-lock me-2"></i>Privacidade</h5>
+              <p class="small-muted mb-0">Usamos os dados apenas para sua cotação e contato sobre o pedido. Você pode solicitar remoção/cópia dos dados.</p>
+            </div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="py-4 border-top bg-white">
+    <div class="container small text-center">© <span id="year"></span> SG Transportes. Todos os direitos reservados.</div>
+  </footer>
+
+  <!-- Modal de confirmação -->
+  <div class="modal fade" id="modalOk" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa-solid fa-circle-check text-success me-2"></i>Solicitação enviada</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-1">Recebemos sua solicitação de cotação. </p>
+        <p class="mb-2">Envie este <strong>código de cotação</strong> para o seu anunciante:</p>
+        <div class="d-flex align-items-center gap-2">
+          <code id="codigoCotacao" class="px-2 py-1 bg-light rounded"></code>
+          <span class="badge bg-secondary copy-badge" id="btnCopiar"><i class="fa-regular fa-copy me-1"></i>Copiar</span>
+        </div>
+        <small class="text-muted d-block mt-2">Guarde o código. Ele também foi enviado junto com sua solicitação.</small>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+        <a class="btn btn-primary" id="btnNova" href="#cotacao">Nova solicitação</a>
+      </div>
+    </div></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // --- Helpers ---
+    const $cepInputs = $('.cep');
+    const $aceitoLocalizacao = $('#aceitoLocalizacao');
+    const $locMsg = $('#locMsg');
+    const $locLinkWrap = $('#locLinkWrap');
+    const $locLink = $('#locLink');
+    const $btnEnviar = $('#btnEnviar');
+    const $spinner = $('#spinner');
+
+    let geo = null; // { lat, lng, accuracy }
+
+    function onlyDigits(v){ return (v||'').replace(/\D/g,''); }
+    function toCEP(v){ v = onlyDigits(v).slice(0,8); return v.length>5 ? v.slice(0,5)+'-'+v.slice(5) : v; }
+    function mapsLink(lat,lng){ return `https://maps.google.com/?q=${lat},${lng}`; }
+    function maskPhone(v){
+      v = onlyDigits(v).slice(0,11);
+      if(v.length>10) return v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+      if(v.length>6)  return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+      if(v.length>2)  return v.replace(/^(\d{0,2})(\d{0,5})/, '($1) $2');
+      return v;
+    }
+    const STATE_TO_UF = {
+      "Acre":"AC","Alagoas":"AL","Amapá":"AP","Amazonas":"AM","Bahia":"BA","Ceará":"CE","Distrito Federal":"DF",
+      "Espírito Santo":"ES","Goiás":"GO","Maranhão":"MA","Mato Grosso":"MT","Mato Grosso do Sul":"MS","Minas Gerais":"MG",
+      "Pará":"PA","Paraíba":"PB","Paraná":"PR","Pernambuco":"PE","Piauí":"PI","Rio de Janeiro":"RJ","Rio Grande do Norte":"RN",
+      "Rio Grande do Sul":"RS","Rondônia":"RO","Roraima":"RR","Santa Catarina":"SC","São Paulo":"SP","Sergipe":"SE","Tocantins":"TO"
+    };
+
+    $('#telefone').on('input', function(){ this.value = maskPhone(this.value); });
+    $cepInputs.on('input', function(){ this.value = toCEP(this.value); });
+
+    // --- ViaCEP (preenche campos por prefixo r_ ou e_) ---
+    async function fillFromViaCep(prefix){
+      const $cep = $(`#${prefix}_cep`);
+      const cep = onlyDigits($cep.val());
+      const $status = $(`#${prefix}_viaCepStatus`);
+      if(cep.length !== 8){ $status.text('Informe um CEP válido (8 dígitos).').addClass('text-danger'); return; }
+      $status.removeClass('text-danger').text('Buscando endereço...');
+      try{
+        const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await res.json();
+        if(data.erro){ $status.text('CEP não encontrado.'); return; }
+        $(`#${prefix}_logradouro`).val(data.logradouro || '');
+        $(`#${prefix}_bairro`).val(data.bairro || '');
+        $(`#${prefix}_cidade`).val(data.localidade || '');
+        $(`#${prefix}_uf`).val(data.uf || '');
+        $status.text('Endereço preenchido com sucesso.');
+      } catch(e){ $status.text('Falha ao consultar CEP.'); }
+    }
+    $('#r_btnViaCep').on('click', ()=>fillFromViaCep('r'));
+    $('#e_btnViaCep').on('click', ()=>fillFromViaCep('e'));
+
+    // --- Geolocalização -> Reverse Geocoding (Nominatim) para RETIRADA ---
+    async function reverseGeocode(lat,lng){
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=pt-BR`;
+      const res = await fetch(url);       // Em produção, considere usar um provedor com chave/cota.
+      if(!res.ok) throw new Error('Reverse geocoding falhou');
+      return await res.json();
+    }
+
+    $aceitoLocalizacao.on('change', async function(){
+      if(this.checked){
+        if(!('geolocation' in navigator)){
+          $locMsg.text('Seu navegador não suporta geolocalização.');
+          this.checked = false; return;
+        }
+        $locMsg.text('Obtendo localização...');
+        navigator.geolocation.getCurrentPosition(async pos => {
+          geo = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy };
+          $locMsg.text(`Localização capturada (±${Math.round(geo.accuracy)}m). Preenchendo endereço...`);
+          $locLink.attr('href', mapsLink(geo.lat, geo.lng));
+          $locLinkWrap.removeClass('is-hidden');
+          try {
+            const data = await reverseGeocode(geo.lat, geo.lng);
+            const a = data.address || {};
+            // CEP
+            if(a.postcode) $('#r_cep').val(toCEP(a.postcode));
+            // Logradouro e bairro
+            $('#r_logradouro').val(a.road || a.pedestrian || a.cycleway || a.footway || a.neighbourhood || '');
+            $('#r_bairro').val(a.suburb || a.neighbourhood || a.quarter || '');
+            // Cidade
+            $('#r_cidade').val(a.city || a.town || a.village || a.municipality || a.county || '');
+            // UF
+            let uf = a.state_code;
+            if(!uf && a['ISO3166-2-lvl4']) { const p = a['ISO3166-2-lvl4'].split('-'); uf = p[p.length-1]; }
+            if(!uf && a.state && STATE_TO_UF[a.state]) uf = STATE_TO_UF[a.state];
+            if(uf) $('#r_uf').val(uf);
+            $locMsg.text(`Endereço de retirada preenchido pela sua localização (±${Math.round(geo.accuracy)}m).`);
+          } catch(e){
+            $locMsg.text('Localização obtida, mas não foi possível converter para endereço automaticamente.');
+          }
+        }, err => {
+          geo = null; $locMsg.text('Não foi possível obter a localização.');
+          $aceitoLocalizacao.prop('checked', false);
+        }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
+      } else {
+        geo = null; $locMsg.text('Localização não capturada.');
+        $locLinkWrap.addClass('is-hidden');
+      }
+    });
+
+    // --- Geração de código de cotação ---
+    function randomCode(len=6){
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sem 0/O/1/I
+      let out = '';
+      for(let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
+      return out;
+    }
+    function makeCodigo(){
+      const d = new Date();
+      const ymd = d.toISOString().slice(0,10).replace(/-/g,''); // YYYYMMDD
+      return `SG-${ymd}-${randomCode(6)}`;
+    }
+
+    // --- Submit ---
+    $('#formCotacao').on('submit', async function(e){
+      e.preventDefault();
+
+      const nome = $('#nome').val().trim();
+      const email = $('#email').val().trim();
+      const telefone = $('#telefone').val().trim();
+
+      const retirada = {
+        cep: onlyDigits($('#r_cep').val()),
+        logradouro: $('#r_logradouro').val().trim(),
+        numero: $('#r_numero').val().trim(),
+        complemento: $('#r_complemento').val().trim(),
+        bairro: $('#r_bairro').val().trim(),
+        cidade: $('#r_cidade').val().trim(),
+        uf: $('#r_uf').val().trim()
+      };
+
+      const entrega = {
+        cep: onlyDigits($('#e_cep').val()),
+        logradouro: $('#e_logradouro').val().trim(),
+        numero: $('#e_numero').val().trim(),
+        complemento: $('#e_complemento').val().trim(),
+        bairro: $('#e_bairro').val().trim(),
+        cidade: $('#e_cidade').val().trim(),
+        uf: $('#e_uf').val().trim()
+      };
+
+      const detalhes = $('#detalhes').val().trim();
+
+      // validação mínima
+      if(!nome || !email || retirada.cep.length!==8 || !retirada.numero || entrega.cep.length!==8 || !entrega.numero){
+        alert('Preencha Nome, E-mail, CEP e Número de Retirada e Entrega.');
+        return;
+      }
+
+      const codigo = makeCodigo();
+
+      // strings compatíveis com backend antigo (cep/endereco/detalhes)
+      const enderecoRetiradaStr =
+        `${retirada.logradouro || ''}, ${retirada.numero}${retirada.complemento? ' - '+retirada.complemento:''}, ${retirada.bairro || ''}, ${retirada.cidade || ''} - ${retirada.uf || ''}`;
+      const enderecoEntregaStr =
+        `${entrega.logradouro || ''}, ${entrega.numero}${entrega.complemento? ' - '+entrega.complemento:''}, ${entrega.bairro || ''}, ${entrega.cidade || ''} - ${entrega.uf || ''}`;
+
+      const payload = {
+        // novos campos
+        codigo,
+        retirada,
+        entrega,
+        // compat com seu handler atual:
+        nome, email, telefone,
+        cep: retirada.cep,
+        endereco: enderecoRetiradaStr,
+        detalhes: `${detalhes}\n\nCódigo de cotação: ${codigo}\nEntrega: ${enderecoEntregaStr} (CEP ${entrega.cep})`,
+        geo: geo ? { lat: geo.lat, lng: geo.lng, accuracy: geo.accuracy } : null,
+        consentLocalizacao: !!geo
+      };
+
+      try{
+        $btnEnviar.prop('disabled', true);
+        $spinner.removeClass('d-none');
+
+        const res = await fetch('/api/quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error('Falha ao enviar');
+
+        // Modal com o código
+        const modalEl = document.getElementById('modalOk');
+        document.getElementById('codigoCotacao').textContent = codigo;
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        // reset
+        $('#formCotacao')[0].reset();
+        $('#r_viaCepStatus, #e_viaCepStatus').text('');
+        $locLinkWrap.addClass('is-hidden');
+        $locMsg.text('Localização não capturada.');
+      }catch(err){
+        console.error(err);
+        alert('Não foi possível enviar sua solicitação agora. Tente novamente mais tarde.');
+      }finally{
+        $btnEnviar.prop('disabled', false);
+        $spinner.addClass('d-none');
+      }
+    });
+
+    // Copiar código
+    $('#btnCopiar').on('click', async function(){
+      const code = document.getElementById('codigoCotacao').textContent.trim();
+      try{
+        await navigator.clipboard.writeText(code);
+        this.classList.replace('bg-secondary','bg-success');
+        this.innerHTML = '<i class="fa-solid fa-check me-1"></i>Copiado';
+        setTimeout(()=>{
+          this.classList.replace('bg-success','bg-secondary');
+          this.innerHTML = '<i class="fa-regular fa-copy me-1"></i>Copiar';
+        }, 1800);
+      }catch{
+        alert('Copie manualmente: ' + code);
+      }
+    });
+
+    // Ano no rodapé
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
