@@ -4,56 +4,121 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SG Transportes — Cotação de Frete</title>
+
+  <!-- SEO / Social -->
   <meta name="description" content="Informe endereços de retirada e entrega. Geolocalização opcional para preencher automaticamente o endereço de retirada. Envie o código de cotação ao anunciante." />
+  <meta property="og:title" content="SG Transportes — Cotação de Frete">
+  <meta property="og:description" content="Cotação rápida com retirada e entrega. Localização opcional e código de cotação.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="logo-sg-transporte.png">
   <meta name="theme-color" content="#0d6efd" />
+
+  <!-- Favicon / App Icon (usa sua logo transparente) -->
+  <link rel="icon" type="image/png" href="logo-sg-transporte.png" />
+  <link rel="apple-touch-icon" href="logo-sg-transporte.png" />
+  <link rel="preload" as="image" href="logo-sg-transporte.png">
+
+  <!-- Libs -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
   <style>
-    body { background: #f6f7fb; }
-    .navbar-brand i { margin-right: .5rem; }
-    .hero { background: linear-gradient(135deg, #0d6efd 0%, #004aad 100%); color: #fff; padding: 64px 0; }
-    .hero h1 { font-weight: 700; }
-    .card-shadow { box-shadow: 0 10px 30px rgba(0,0,0,.08); border: 0; }
+    :root{
+      --brand:#0d6efd;
+      --brand-2:#004aad;
+      --bg:#f6f7fb;
+    }
+    body { background: var(--bg); }
+    .navbar { position: sticky; top:0; z-index:1020; }
+    .navbar.shadow-blur{ box-shadow: 0 8px 24px rgba(0,0,0,.06); backdrop-filter: saturate(180%) blur(6px); }
+    /* Aumenta o "anúncio" (logo + nome) na navbar */
+    .brand-logo { height: 46px; }             /* antes ~34px */
+    .brand-text { font-size: 1.35rem; }       /* deixa o nome maior */
+    .navbar { padding: .9rem 0; }             /* barra um pouco mais alta */
+
+    @media (min-width: 992px) {               /* em telas grandes, sobe mais um pouco */
+      .brand-logo { height: 56px; }
+      .brand-text { font-size: 1.6rem; }
+    }
+    .brand-text{ font-weight:700; letter-spacing:.3px; margin-left:.5rem; }
+    .navbar-brand{ display:flex; align-items:center; }
+    .hero{
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+      color:#fff; padding: 80px 0 64px;
+      position: relative; overflow: hidden;
+    }
+    .hero::after{
+      content:""; position:absolute; right:-10%; top:-20%;
+      width:480px; height:480px; border-radius:50%;
+      background: radial-gradient(closest-side, rgba(255,255,255,.12), transparent 70%);
+      transform: rotate(25deg);
+    }
+    .hero h1{ font-weight:800; letter-spacing:.2px; }
+    .card-shadow{ box-shadow: 0 14px 38px rgba(0,0,0,.10); border:0; }
     .form-label .req { color:#dc3545; }
     .small-muted { color:#6c757d; font-size:.9rem; }
-    .lgpd-box { background:#f1f3f5; border-radius:.5rem; padding:.75rem; font-size:.9rem; }
+    .lgpd-box { background:#f1f3f5; border-radius:.75rem; padding:.9rem; font-size:.9rem; }
     footer { color:#6c757d; }
     .is-hidden { display:none!important; }
-    .fieldset-title { font-size:.95rem; font-weight:600; color:#0d6efd; margin-bottom:.5rem; }
+    .fieldset-title { font-size:.95rem; font-weight:700; color:var(--brand); margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.5px;}
     .section-card { border:0; }
     .copy-badge { cursor:pointer; }
+    .badge-soft{
+      background: #e9f2ff; color: #0b5ed7; border:1px solid #bfd1ff;
+    }
+    .accent-bar{
+      height: 3px; width: 64px; background: #fff; opacity:.8; border-radius: 3px;
+    }
+    .floating-whatsapp{
+      position: fixed; right:16px; bottom:16px; z-index:1030;
+      display:flex; align-items:center; gap:.5rem;
+      background:#25D366; color:#fff; padding:.6rem .8rem; border-radius:999px; box-shadow:0 12px 24px rgba(37,211,102,.25);
+      text-decoration:none;
+    }
+    .floating-whatsapp i{ font-size:1.1rem; }
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg bg-white border-bottom">
-    <div class="container">
-      <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-truck-fast"></i> SG Transportes</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Alternar navegação">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="nav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#cotacao">Cotação</a></li>
-          <li class="nav-item"><a class="nav-link" href="#como-funciona">Como funciona</a></li>
-          <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
-          <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
-        </ul>
+    <nav class="navbar navbar-expand-lg bg-white shadow-blur">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <img src="logo-sg-transporte.png" alt="SG Transportes" class="brand-logo" />
+          <span class="brand-text fw-bold ms-2 d-none d-sm-inline">SG Transportes</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Alternar navegação">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link fs-6" href="#cotacao">Cotação</a></li>
+            <li class="nav-item"><a class="nav-link fs-6" href="#como-funciona">Como funciona</a></li>
+            <li class="nav-item"><a class="nav-link fs-6" href="#faq">FAQ</a></li>
+            <li class="nav-item"><a class="nav-link fs-6" href="#contato">Contato</a></li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </nav>
+    </nav>
+  
 
+  <!-- HERO -->
   <header class="hero">
     <div class="container">
       <div class="row align-items-center g-4">
         <div class="col-lg-6">
-          <h1 class="mb-3">Cotação de frete rápida e transparente</h1>
+          <div class="accent-bar mb-3"></div>
+          <h1 class="mb-3">Cotação de frete <span class="fw-light">rápida</span> e <span class="fw-light">transparente</span></h1>
           <p class="mb-4">Preencha os endereços de <strong>Retirada</strong> e <strong>Entrega</strong>. Se quiser, autorize a <strong>localização</strong> para <u>preencher automaticamente</u> a retirada.</p>
-          <span class="badge rounded-pill bg-light text-dark"><i class="fa-solid fa-shield-halved me-1"></i> Dados usados apenas para cotação (LGPD)</span>
+          <span class="badge rounded-pill badge-soft"><i class="fa-solid fa-shield-halved me-1"></i> Dados usados apenas para cotação (LGPD)</span>
         </div>
+
+        <!-- FORM -->
         <div class="col-lg-6">
           <div class="card card-shadow section-card">
             <div class="card-body p-4">
-              <h5 class="card-title mb-3" id="cotacao"><i class="fa-solid fa-calculator me-2"></i>Solicitar cotação</h5>
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <img src="logo-sg-transporte.png" alt="SG" style="height:28px">
+                <h5 class="card-title mb-0" id="cotacao">Solicitar cotação</h5>
+              </div>
 
               <form id="formCotacao" novalidate>
                 <!-- Identificação -->
@@ -206,6 +271,7 @@
     </div>
   </header>
 
+  <!-- SEÇÕES -->
   <main class="py-5">
     <div class="container">
       <section class="mb-5" id="como-funciona">
@@ -246,12 +312,55 @@
           </div>
         </div>
       </section>
+
+      <section id="contato" class="mt-4">
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="card card-shadow h-100">
+              <div class="card-body d-flex align-items-center gap-3">
+                <img src="logo-sg-transporte.png" alt="SG" style="height:38px">
+                <div>
+                  <h5 class="mb-1">Atendimento</h5>
+                  <p class="small-muted mb-1">
+                    <a href="mailto:contato@sgtransportes.com.br">contato@sgtransportes.com.br</a> ·
+                    <a href="tel:+551135087214">(11) 3508-7214</a> (seg–sex, 8h–18h)
+                  </p>
+                  <p class="small-muted mb-0">
+                    <i class="fa-brands fa-whatsapp text-success me-1"></i>
+                    <a href="https://wa.me/5511987654321" target="_blank" rel="noreferrer">(11) 98765-4321</a> (WhatsApp)
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+          <div class="col-lg-6">
+            <div class="card card-shadow h-100">
+              <div class="card-body">
+                <h5 class="mb-2"><i class="fa-solid fa-scale-balanced me-2"></i>LGPD</h5>
+                <p class="small-muted mb-0">
+                  Coletamos apenas o necessário para a cotação. Você pode solicitar remoção ou cópia dos dados a qualquer momento.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>      
     </div>
   </main>
 
+  <!-- FOOTER -->
   <footer class="py-4 border-top bg-white">
-    <div class="container small text-center">© <span id="year"></span> SG Transportes. Todos os direitos reservados.</div>
+    <div class="container small text-center d-flex align-items-center justify-content-center gap-2">
+      <img src="logo-sg-transporte.png" alt="SG" style="height:20px">
+      <span>© <span id="year"></span> SG Transportes. Todos os direitos reservados.</span>
+    </div>
   </footer>
+
+  <!-- CTA WhatsApp (opcional) -->
+  <a class="floating-whatsapp" href="https://wa.me/5500000000000" target="_blank" rel="noreferrer" title="Falar no WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i><span class="d-none d-sm-inline">Fale conosco</span>
+  </a>
 
   <!-- Modal de confirmação -->
   <div class="modal fade" id="modalOk" tabindex="-1" aria-hidden="true">
@@ -276,6 +385,7 @@
     </div></div>
   </div>
 
+  <!-- SCRIPTS -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -310,7 +420,7 @@
     $('#telefone').on('input', function(){ this.value = maskPhone(this.value); });
     $cepInputs.on('input', function(){ this.value = toCEP(this.value); });
 
-    // --- ViaCEP (preenche campos por prefixo r_ ou e_) ---
+    // ViaCEP
     async function fillFromViaCep(prefix){
       const $cep = $(`#${prefix}_cep`);
       const cep = onlyDigits($cep.val());
@@ -331,14 +441,13 @@
     $('#r_btnViaCep').on('click', ()=>fillFromViaCep('r'));
     $('#e_btnViaCep').on('click', ()=>fillFromViaCep('e'));
 
-    // --- Geolocalização -> Reverse Geocoding (Nominatim) para RETIRADA ---
+    // Reverse geocoding (retirada)
     async function reverseGeocode(lat,lng){
       const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=pt-BR`;
-      const res = await fetch(url);       // Em produção, considere usar um provedor com chave/cota.
+      const res = await fetch(url);
       if(!res.ok) throw new Error('Reverse geocoding falhou');
       return await res.json();
     }
-
     $aceitoLocalizacao.on('change', async function(){
       if(this.checked){
         if(!('geolocation' in navigator)){
@@ -354,14 +463,10 @@
           try {
             const data = await reverseGeocode(geo.lat, geo.lng);
             const a = data.address || {};
-            // CEP
             if(a.postcode) $('#r_cep').val(toCEP(a.postcode));
-            // Logradouro e bairro
             $('#r_logradouro').val(a.road || a.pedestrian || a.cycleway || a.footway || a.neighbourhood || '');
             $('#r_bairro').val(a.suburb || a.neighbourhood || a.quarter || '');
-            // Cidade
             $('#r_cidade').val(a.city || a.town || a.village || a.municipality || a.county || '');
-            // UF
             let uf = a.state_code;
             if(!uf && a['ISO3166-2-lvl4']) { const p = a['ISO3166-2-lvl4'].split('-'); uf = p[p.length-1]; }
             if(!uf && a.state && STATE_TO_UF[a.state]) uf = STATE_TO_UF[a.state];
@@ -380,20 +485,18 @@
       }
     });
 
-    // --- Geração de código de cotação ---
+    // Código de cotação
     function randomCode(len=6){
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sem 0/O/1/I
-      let out = '';
-      for(let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let out = ''; for(let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
       return out;
     }
     function makeCodigo(){
-      const d = new Date();
-      const ymd = d.toISOString().slice(0,10).replace(/-/g,''); // YYYYMMDD
+      const d = new Date(); const ymd = d.toISOString().slice(0,10).replace(/-/g,'');
       return `SG-${ymd}-${randomCode(6)}`;
     }
 
-    // --- Submit ---
+    // Submit
     $('#formCotacao').on('submit', async function(e){
       e.preventDefault();
 
@@ -423,7 +526,6 @@
 
       const detalhes = $('#detalhes').val().trim();
 
-      // validação mínima
       if(!nome || !email || retirada.cep.length!==8 || !retirada.numero || entrega.cep.length!==8 || !entrega.numero){
         alert('Preencha Nome, E-mail, CEP e Número de Retirada e Entrega.');
         return;
@@ -431,18 +533,13 @@
 
       const codigo = makeCodigo();
 
-      // strings compatíveis com backend antigo (cep/endereco/detalhes)
       const enderecoRetiradaStr =
         `${retirada.logradouro || ''}, ${retirada.numero}${retirada.complemento? ' - '+retirada.complemento:''}, ${retirada.bairro || ''}, ${retirada.cidade || ''} - ${retirada.uf || ''}`;
       const enderecoEntregaStr =
         `${entrega.logradouro || ''}, ${entrega.numero}${entrega.complemento? ' - '+entrega.complemento:''}, ${entrega.bairro || ''}, ${entrega.cidade || ''} - ${entrega.uf || ''}`;
 
       const payload = {
-        // novos campos
-        codigo,
-        retirada,
-        entrega,
-        // compat com seu handler atual:
+        codigo, retirada, entrega,
         nome, email, telefone,
         cep: retirada.cep,
         endereco: enderecoRetiradaStr,
@@ -463,10 +560,8 @@
         if(!res.ok) throw new Error('Falha ao enviar');
 
         // Modal com o código
-        const modalEl = document.getElementById('modalOk');
         document.getElementById('codigoCotacao').textContent = codigo;
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
+        new bootstrap.Modal(document.getElementById('modalOk')).show();
 
         // reset
         $('#formCotacao')[0].reset();
