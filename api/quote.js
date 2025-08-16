@@ -1,15 +1,13 @@
 // /api/quote.js
-export const config = { runtime: 'nodejs18.x' }; // garante Node (não Edge)
+export const config = { runtime: 'nodejs' }; // use "nodejs" na Vercel
 
 import sgMail from '@sendgrid/mail';
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
 // helpers
 const onlyDigits = (v = '') => String(v).replace(/\D/g, '');
-const join = (arr) => arr.filter(Boolean).join(', ');
 const addrLine = (o = {}) => {
-  const linha1 = [o.logradouro, o.numero ? `nº ${o.numero}` : null, o.complemento].filter(Boolean).join(' ');
+  const linha1 = [o.logradouro, o.numero ? `nº ${o.numero}` : null, o.complemento]
+    .filter(Boolean).join(' ');
   const linha2 = [o.bairro, o.cidade].filter(Boolean).join(', ');
   const uf = o.uf ? ` - ${o.uf}` : '';
   return [linha1, linha2 ? linha2 + uf : null].filter(Boolean).join(' | ');
@@ -17,7 +15,8 @@ const addrLine = (o = {}) => {
 const mapsFromGeo = (geo) => `https://maps.google.com/?q=${geo.lat},${geo.lng}`;
 const mapsFromAddr = (o = {}, cep) => {
   const q = [
-    o.logradouro, o.numero, o.complemento, o.bairro, o.cidade, o.uf, cep ? `CEP ${cep}` : null,
+    o.logradouro, o.numero, o.complemento, o.bairro, o.cidade, o.uf,
+    cep ? `CEP ${cep}` : null,
   ].filter(Boolean).join(', ');
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
 };
@@ -36,6 +35,9 @@ export default async function handler(req, res) {
     });
   }
 
+  // configura a API Key somente após validar envs
+  sgMail.setApiKey(SENDGRID_API_KEY);
+
   try {
     const body = req.body || {};
 
@@ -45,10 +47,12 @@ export default async function handler(req, res) {
       retirada = {},     // { cep, logradouro, numero, complemento, bairro, cidade, uf }
       entrega = {},      // { cep, logradouro, numero, complemento, bairro, cidade, uf }
       geoRetirada,       // { lat, lng, accuracy } (opcional)
-      // Campos antigos (compatibilidade):
+
+      // Campos antigos (compat):
       cep,               // cep de retirada
       endereco,          // endereço de retirada formatado
       geo,               // geo antigo
+
       detalhes,
       nome,
       email,
@@ -56,7 +60,7 @@ export default async function handler(req, res) {
       consentLocalizacao,
     } = body;
 
-    // Compatibilidade: se não vier retirada.cep, usa o "cep" legado
+    // Compat: se não vier retirada.cep, usa o "cep" legado
     const rCep = onlyDigits(retirada.cep || cep || '');
     const eCep = onlyDigits(entrega.cep || '');
 
@@ -67,23 +71,19 @@ export default async function handler(req, res) {
     }
 
     // Monta strings úteis
-    const rAddrStr = retirada.logradouro || retirada.bairro || retirada.cidade || retirada.uf
+    const rAddrStr = (retirada.logradouro || retirada.bairro || retirada.cidade || retirada.uf)
       ? addrLine(retirada)
       : (endereco || '—');
 
-    const eAddrStr = entrega.logradouro || entrega.bairro || entrega.cidade || entrega.uf
+    const eAddrStr = (entrega.logradouro || entrega.bairro || entrega.cidade || entrega.uf)
       ? addrLine(entrega)
       : (eCep ? `CEP ${eCep}` : '—');
 
-    const hasGeo = Boolean(geoRetirada || geo);
     const geoObj = geoRetirada || geo || null;
-    const mapaRetirada = hasGeo
-      ? mapsFromGeo(geoObj)
-      : mapsFromAddr(retirada, rCep);
+    const hasGeo = Boolean(geoObj);
 
-    const mapaEntrega = eCep || eAddrStr !== '—'
-      ? mapsFromAddr(entrega, eCep)
-      : null;
+    const mapaRetirada = hasGeo ? mapsFromGeo(geoObj) : mapsFromAddr(retirada, rCep);
+    const mapaEntrega = (eCep || eAddrStr !== '—') ? mapsFromAddr(entrega, eCep) : null;
 
     const assunto = `Nova cotação — ${nome} — ${rCep}${eCep ? ' ➜ ' + eCep : ''}${codigo ? ` [${codigo}]` : ''}`;
 
@@ -145,9 +145,7 @@ ${detalhes || '—'}
 
         <h3 style="margin:16px 0 6px;font-size:16px">Detalhes</h3>
         <pre style="white-space:pre-wrap;background:#f6f7fb;padding:8px;border-radius:6px;border:1px solid #eee;margin:0">${(detalhes || '—')
-          .toString()
-          .replace(/</g,'&lt;')
-          .replace(/>/g,'&gt;')}</pre>
+          .toString().replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
 
         <hr style="margin:16px 0;border:none;border-top:1px solid #eee">
         <p style="font-size:12px;color:#555;margin:0">
@@ -158,14 +156,13 @@ ${detalhes || '—'}
 
     await sgMail.send({
       to: MAIL_TO,
-      from: MAIL_FROM,          // remetente verificado no SendGrid
-      replyTo: email,           // facilita responder direto ao solicitante
+      from: MAIL_FROM,  // remetente verificado no SendGrid
+      replyTo: email,
       subject: assunto,
       text: texto,
       html,
     });
 
-    // responde também o código para o front (útil se quiser exibir/confirmar)
     return res.status(200).json({ ok: true, codigo: codigo || null });
   } catch (err) {
     console.error('Erro ao enviar e-mail:', err?.response?.body || err);
